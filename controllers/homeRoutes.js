@@ -28,24 +28,41 @@ router.get('/pokemon/:id', withAuth, async (req, res) => {
 });
 
 // GET USER by ID
-router.get('/users/:id', async (req, res) => {
+// router.get('/users/:id', async (req, res) => {
+//   try {
+//     const userData = await User.findByPk(req.params.id, {
+//       include: [{
+//         model: Pokemon,
+//       }]
+//     });
+//     const userSerialize = JSON.parse(JSON.stringify(userData));
+//     res.render('collection', {
+//       ...userSerialize,
+//       logged_in: req.session.logged_in
+//     })
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// })
+
+router.get('/collection', withAuth, async (req, res) => {
   try {
-    const userData = await User.findByPk(req.params.id, {
-      include: [{
-        model: Pokemon,
-      }]
+    // Find the logged in user based on the session ID
+    const userData = await User.findByPk(req.session.user_id, {
+      attributes: { exclude: ['password'] },
+      include: [{ model: Pokemon }],
     });
-    const userSerialize = JSON.parse(JSON.stringify(userData));
+
+    const user = JSON.parse(JSON.stringify(userData));
+
     res.render('collection', {
-      ...userSerialize,
-      logged_in: req.session.logged_in
-    })
+      ...user,
+      logged_in: true
+    });
   } catch (err) {
     res.status(500).json(err);
   }
-})
-
-
+});
 
 
 
